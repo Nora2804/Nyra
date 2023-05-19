@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IProduct } from 'src/app/interface/Product';
+import { ProductService } from 'src/services/product.service';
 
 @Component({
   selector: 'app-product-list',
@@ -7,15 +8,17 @@ import { IProduct } from 'src/app/interface/Product';
   styleUrls: ['./product-list.component.scss']
 })
 export class ProductListComponent {
+  products: IProduct[] = []
   title = 'Quản lý sản phẩm';
   status: boolean = false;
   valueInput: string = "";
 
+  constructor(private productService: ProductService) {
+    this.productService.getProducts().subscribe(data => {
+      this.products = data;
+    }, error => console.log(error))
+  }
 
-  products: IProduct[] = [
-    { id: 1, name: "Product A", price: 200, img: "ảnh" },
-    { id: 2, name: "Product B", price: 300, img: "ảnh" }
-  ]
   toggle() {
     console.log('1')
     this.status = !this.status;
@@ -24,9 +27,9 @@ export class ProductListComponent {
     this.valueInput = e.target.value
   }
   removeItem(id: any) {
-    console.log(id);
-    this.products = this.products.filter(item => item.id !== id);
+    this.productService.deleteProduct(id).subscribe(() => {
+      console.log('Ban da xoa thanh cong')
+      this.products = this.products.filter(item => item.id != id)
+    })
   }
-
-
 }
